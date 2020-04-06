@@ -12,7 +12,6 @@ test_df = pd.read_csv("Data/test.csv")
 count_vectorizer = feature_extraction.text.CountVectorizer()
 
 ## let's get counts for the first 5 tweets in the data
-example_train_vectors = count_vectorizer.fit_transform(train_df["text"])
 train_vectors = count_vectorizer.fit_transform(train_df["text"])
 
 ## note that we're NOT using .fit_transform() here. Using just .transform() makes sure
