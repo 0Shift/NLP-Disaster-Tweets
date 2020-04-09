@@ -26,7 +26,7 @@ print(example_train_vectors[0].todense())
 model = Sequential()
 
 model.add(LSTM(128, activation='relu', return_sequences = True))
-model.add(Dropout(0.1))
+#model.add(Dropout(0.1))
 
 model.add(LSTM(128, activation='relu'))
 model.add(Dropout(0.1))
@@ -34,7 +34,7 @@ model.add(Dropout(0.1))
 model.add(Dense(32, activation='relu'))
 model.add(Dropout(0.1))
 
-model.add(Dense(2, activation='softmax'))
+model.add(Dense(1, activation='sigmoid'))
 
 opt = tf.keras.optimizers.Adam(learning_rate=1e-3, decay=1e-5)
 
