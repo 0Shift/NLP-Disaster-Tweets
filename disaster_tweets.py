@@ -1,36 +1,43 @@
 import numpy as np 
 import pandas as pd 
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, LSTM
 from sklearn import feature_extraction, linear_model, model_selection, preprocessing
 
-
-
-# Starter code from: https://www.kaggle.com/philculliton/nlp-getting-started-tutorial
 
 train_df = pd.read_csv("Data/train.csv")
 test_df = pd.read_csv("Data/test.csv")
 
 
+
 count_vectorizer = feature_extraction.text.CountVectorizer()
 
-## let's get counts for the first 5 tweets in the data
-example_train_vectors = count_vectorizer.fit_transform(train_df["text"][0:5])
+
+example_train_vectors = count_vectorizer.fit_transform(train_df["text"])
 
 train_vectors = count_vectorizer.fit_transform(train_df["text"])
 
-## note that we're NOT using .fit_transform() here. Using just .transform() makes sure
-# that the tokens in the train vectors are the only ones mapped to the test vectors - 
-# i.e. that the train and test vectors use the same set of tokens.
 test_vectors = count_vectorizer.transform(test_df["text"])
 
+print(example_train_vectors[0].todense().shape)
+print(example_train_vectors[0].todense())
 
-## Our vectors are really big, so we want to push our model's weights
-## toward 0 without completely discounting different words - ridge regression 
-## is a good way to do this.
-clf = linear_model.RidgeClassifier()
+model = Sequential()
 
-clf.fit(train_vectors, train_df["target"])
+model.add(LSTM(128, activation='relu', return_sequences = True))
+model.add(Dropout(0.1))
 
-sample_submission = pd.read_csv("sample_submission.csv")
+model.add(LSTM(128, activation='relu'))
+model.add(Dropout(0.1))
 
-sample_submission["target"] = clf.predict(test_vectors)
-print(sample_submission.head())
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.1))
+
+model.add(Dense(2, activation='softmax'))
+
+opt = tf.keras.optimizers.Adam(learning_rate=1e-3, decay=1e-5)
+
+model.compile(loss='mean_squared_error', optimizer=opt, metrics=['accuracy'])
+
+model.fit(train_vectors, epochs = 3, validation_data = test_vectors)
