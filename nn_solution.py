@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from collections import defaultdict
 from keras.models import Sequential
 from keras import layers
+import string
 import matplotlib.pyplot as plt
 import re
 
@@ -28,12 +29,23 @@ import re
 #                     corpus[split] = 1
 #     return corpus
 
+def clean_text(text):
+    '''Make text lowercase, remove text in square brackets,remove links,remove punctuation
+    and remove words containing numbers.'''
+    text = text.lower()
+    text = re.sub('\[.*?\]', '', text)
+    text = re.sub('https?://\S+|www\.\S+', '', text)
+    text = re.sub('<.*?>+', '', text)
+    text = re.sub('[%s]' % re.escape(string.punctuation), '', text)
+    text = re.sub('\n', '', text)
+    text = re.sub('\w*\d\w*', '', text)
+    return text
 
 train = pd.read_csv("Data/train.csv")
 test_vectors = pd.read_csv("Data/test.csv")
 
 # train = train[train['target']==0]
-text = train["text"].values
+text = train["text"].apply(lambda x: clean_text(x)).values
 target = train["target"].values
 
 # countwords = len(text)
@@ -68,7 +80,7 @@ model.add(layers.Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.summary()
 
-model.fit(x_train, y_train, epochs=30, verbose=False, validation_data=(x_test, y_test), batch_size=10)
+model.fit(x_train, y_train, epochs=20, verbose=False, validation_data=(x_test, y_test), batch_size=10)
 
 loss, accuracy = model.evaluate(x_train, y_train, verbose=False)
 print("Training Accuracy: {:.4f}".format(accuracy))

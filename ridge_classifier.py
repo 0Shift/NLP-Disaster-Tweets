@@ -1,6 +1,7 @@
 import numpy as np 
 import pandas as pd 
-from sklearn import feature_extraction, linear_model, model_selection, preprocessing, naive_bayes 
+from sklearn import feature_extraction, linear_model, model_selection, preprocessing, naive_bayes
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 
 
@@ -31,13 +32,6 @@ clf.fit(train_vectors, y_train)
 scores = model_selection.cross_val_score(clf, test_vectors, y_test, scoring="f1")
 print("Rigid Classifier CV F1 Scores:", scores * 100)
 
-clf = naive_bayes.MultinomialNB()
-clf.fit(train_vectors, y_train)
-scores = model_selection.cross_val_score(clf, test_vectors, y_test, scoring="f1")
-print("MNB CV F1 Scores:", scores * 100)
-
-
-
 tfid_vectorizer = feature_extraction.text.TfidfVectorizer()
 tfid_vectorizer.fit(list(x_train))
 train_vectors = tfid_vectorizer.transform(x_train)
@@ -46,12 +40,7 @@ test_vectors = tfid_vectorizer.transform(x_test)
 clf = linear_model.RidgeClassifier()
 clf.fit(train_vectors, y_train)
 scores = model_selection.cross_val_score(clf, test_vectors, y_test, scoring="f1")
-print("Rigid Classifier TFID F1 Scores:", scores * 100)
-
-clf = naive_bayes.MultinomialNB()
-clf.fit(train_vectors, y_train)
-scores = model_selection.cross_val_score(clf, test_vectors, y_test, scoring="f1")
-print("MNB TFID F1 Scores:", scores * 100)
+print("Ridge Classifier TFID F1 Scores:", scores * 100)
 
 # sample_submission = pd.read_csv("sample_submission.csv")
 
