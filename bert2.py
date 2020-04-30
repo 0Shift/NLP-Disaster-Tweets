@@ -7,6 +7,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint
 import tensorflow_hub as hub
 import tokenization
+import tensorflow.keras.models
 
 
 def bert_encode(texts, tokenizer, max_len=512):
@@ -64,16 +65,12 @@ train_labels = train.target.values
 model = build_model(bert_layer, max_len=160)
 model.summary()
 
-train_history = model.fit(
-    train_input, train_labels,
-    validation_split=0.2,
-    epochs=2,
-    batch_size=16
+model = tensorflow.keras.models.load_model(
+    'model.h5', custom_objects={'KerasLayer':bert_layer}, compile=True
 )
 
-model.save('model.h5')
-
 test_pred = model.predict(test_input)
+
 
 submission['target'] = test_pred.round().astype(int)
 submission.to_csv('submission.csv', index=False)
